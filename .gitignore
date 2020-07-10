@@ -1,0 +1,6 @@
+*.log
+terraform.tfstate*
+screenshots/*/
+input.txt
+keys/*
+.terraform

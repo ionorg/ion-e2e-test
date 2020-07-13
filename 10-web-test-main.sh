@@ -29,16 +29,21 @@ echo "2. Launching browser and searching for hot pink..."
 echo "This takes ~ 20 seconds per browser, plus browserstack queue time for MAC or IOS"
 echo "Targets: $MULTI"
 
-/usr/bin/python3 $DIR/browsertest.py
+/usr/bin/python3 $DIR/browsertest.py | tee /tmp/browsertest.log
 
 echo
 echo "======================="
 echo
 echo "All done!"
+
 sleep 3
 PIDS=$(ps -ef | grep join | grep go-build | awk '{print $2}')
-if [[ !-z "$PIDS" ]]; then
+if [[ -z "$PIDS" ]]; then
+    echo "No pink.video to clean up! Did the job run longer than 600 seconds?"
+else
     echo "cleaning up... $PIDS"
 
     kill -9 $PIDS
 fi
+
+cat /tmp/browsertest.log | grep 'Test failed' && exit 1 || (echo "All tests passed!" && exit 0) # Die if tests failed

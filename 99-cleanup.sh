@@ -13,6 +13,7 @@ export TF_VAR_SSH_PUBLIC_KEY=""
 bash $DIR/01-create-linode-credentials.sh
 
 pushd $DIR
+terraform init || true
 terraform destroy -auto-approve
 popd
 

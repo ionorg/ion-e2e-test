@@ -18,7 +18,9 @@ echo "======================="
 echo
 echo "1. Joining $ION_ROOM with pink.video via go client for up to 10 minutes"
 
-(go run $DIR/join.go -d 600 | grep -v "DBG") &
+pushd $DIR
+(go run join.go -d 600 | grep -v "DBG") &
+popd
 
 echo
 echo "======================="

@@ -20,6 +20,7 @@ export TF_VAR_SSH_PUBLIC_KEY=$(cat $KEY.pub)
 export TF_VAR_JOB_ID=$JOB_ID
 echo "Applying terraform..."
 pushd $DIR
+terraform init || true
 terraform apply -auto-approve
 export IP=$(terraform output ip)
 popd

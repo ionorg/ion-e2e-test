@@ -18,10 +18,12 @@ fi
 
 export TF_VAR_SSH_PUBLIC_KEY=$(cat $KEY.pub)
 export TF_VAR_JOB_ID=$JOB_ID
-
+echo "Applying terraform..."
+pushd $DIR
 terraform apply -auto-approve
-
 export IP=$(terraform output ip)
+popd
+
 
 SSH_ARGS="-o StrictHostKeyChecking=no -i $KEY"
 SSH="ssh $SSH_ARGS root@$IP"

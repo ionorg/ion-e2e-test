@@ -12,7 +12,9 @@ export TF_VAR_LINODE_DOMAIN_ID=$LINODE_DOMAIN_ID
 export TF_VAR_SSH_PUBLIC_KEY=""
 bash $DIR/01-create-linode-credentials.sh
 
+pushd $DIR
 terraform destroy -auto-approve
+popd
 
 IDS=$(linode-cli --json domains records-list $LINODE_DOMAIN_ID | jq -c '[ .[] | select( .name | contains("job-'$JOB_ID'.ion-test") ) ] | .[].id')
 if [[ -z "$IDS" ]] ; then

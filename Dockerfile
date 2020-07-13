@@ -17,7 +17,7 @@ ENV LINODE_KEY=""
 ENV LINODE_DOMAIN_ID=""
 ENV GO111MODULE=on
 
-RUN mkdir /test
+RUN mkdir /test /data
 WORKDIR /test
 
 COPY join.go go.mod go.sum /test/
@@ -25,3 +25,6 @@ COPY join.go go.mod go.sum /test/
 RUN go get .
 
 COPY . /test
+
+# Work out of /data so we can mount it for terraform.tfstate
+WORKDIR /data

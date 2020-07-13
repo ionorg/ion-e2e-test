@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e 
+set -e
+export DIR=$(dirname $0)
 export KEY="keys/key-$JOB_ID"
 export ION_VERSION=$(test -z "$ION_VERSION" && echo 'master' || echo "$ION_VERSION")
 export WEB_VERSION=$(test -z "$WEB_VERSION" && echo 'master' || echo "$WEB_VERSION")
@@ -35,6 +36,6 @@ done
 [ $NEXT_WAIT_TIME -lt $MAX_WAIT_TIME ] || (echo "Unable to connect to $IP on ssh..." && exit 1)
 
 echo "Uploading cluster files..."
-scp $SSH_ARGS -r cluster root@$IP:/
+scp $SSH_ARGS -r $DIR/cluster root@$IP:/
 
 $SSH "bash /cluster/bootstrap.sh '$DOMAIN' '$EMAIL' '$ION_VERSION' '$WEB_VERSION'"

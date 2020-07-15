@@ -81,7 +81,9 @@ func doJoin() {
 	peerConnection, err := api.NewPeerConnection(webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
+				URLs:       []string{"turn:turn.streamhuddle.com:3472"},
+				Username:   "huddle",
+				Credential: "huddle999",
 			},
 		},
 	})

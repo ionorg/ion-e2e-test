@@ -22,7 +22,6 @@ pushd $DIR
 (go run join.go -d 0) &
 popd
 
-sleep 60
 echo
 echo "======================="
 echo
@@ -30,7 +29,7 @@ echo "2. Launching browser and searching for hot pink..."
 echo "This takes ~ 20 seconds per browser, plus browserstack queue time for MAC or IOS"
 echo "Targets: $MULTI"
 
-/usr/bin/python3 $DIR/browsertest.py | tee /tmp/browsertest.log
+/usr/bin/python3 $DIR/browsertest.py | tee /data/browsertest.log
 
 chmod -R a+r . || true
 
@@ -49,4 +48,4 @@ else
     kill -9 $PIDS
 fi
 
-cat /tmp/browsertest.log | grep 'Test failed' && exit 1 || (echo "All tests passed!" && exit 0) # Die if tests failed
+cat /data/browsertest.log | grep 'Test failed' && exit 1 || (echo "All tests passed!" && exit 0) # Die if tests failed

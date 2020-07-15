@@ -10,4 +10,5 @@ docker run -ti -e JOB_ID=$1 \
   -e MULTI=windows/chrome,windows/firefox,mac/chrome \
   -v ${PWD}:/data \
   -v /tmp:/tmp \
+  --privileged \
   ${IMAGE}:${VERSION} bash

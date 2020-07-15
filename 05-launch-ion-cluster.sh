@@ -2,7 +2,7 @@
 
 set -e
 export DIR=$(dirname $0)
-export KEY="keys/key-$JOB_ID"
+export KEY="/tmp/key-$JOB_ID"
 export ION_VERSION=$(test -z "$ION_VERSION" && echo 'master' || echo "$ION_VERSION")
 export WEB_VERSION=$(test -z "$WEB_VERSION" && echo 'master' || echo "$WEB_VERSION")
 
@@ -12,7 +12,6 @@ test -z "$EMAIL" && (echo "Error: set EMAIL variable" && exit 1)
 
 # Generate SSH keys for session
 if [[ ! -e $KEY ]] ; then 
-    mkdir -p keys &>/dev/null || true
     ssh-keygen -t rsa -b 2048 -N '' -f $KEY &>/dev/null
 fi
 
@@ -22,6 +21,7 @@ echo "Applying terraform..."
 pushd $DIR
 terraform init || true
 terraform apply -auto-approve
+cp terraform.tfstate /data || true
 export IP=$(terraform output ip)
 popd
 

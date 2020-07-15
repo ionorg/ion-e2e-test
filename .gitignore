@@ -4,3 +4,4 @@ screenshots/*/
 input.txt
 keys/*
 .terraform
+.terraform.tfstate.lock.info

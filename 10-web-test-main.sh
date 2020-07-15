@@ -19,9 +19,10 @@ echo
 echo "1. Joining $ION_ROOM with pink.video via go client for up to 10 minutes"
 
 pushd $DIR
-(go run join.go -d 600 | grep -v "DBG") &
+(go run join.go -d 0) &
 popd
 
+sleep 60
 echo
 echo "======================="
 echo
@@ -30,6 +31,8 @@ echo "This takes ~ 20 seconds per browser, plus browserstack queue time for MAC 
 echo "Targets: $MULTI"
 
 /usr/bin/python3 $DIR/browsertest.py | tee /tmp/browsertest.log
+
+chmod -R a+r . || true
 
 echo
 echo "======================="

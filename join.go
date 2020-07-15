@@ -19,7 +19,6 @@ import (
 	"github.com/cloudwebrtc/go-protoo/transport"
 	"github.com/google/uuid"
 
-	"github.com/pion/ion/pkg/log"
 	"github.com/pion/webrtc/v3"
 	"github.com/pion/webrtc/v3/pkg/media"
 	"github.com/pion/webrtc/v3/pkg/media/ivfreader"
@@ -91,6 +90,13 @@ func doJoin() {
 	}
 	iceConnectedCtx, iceConnectedCtxCancel := context.WithCancel(context.Background())
 
+	offer, _ := peerConnection.CreateOffer(nil)
+
+	// Create channel that is blocked until ICE Gathering is complete
+	gatherComplete := webrtc.GatheringCompletePromise(peerConnection)
+	peerConnection.SetLocalDescription(offer)
+	<-gatherComplete
+
 	// Create a video track
 	videoTrack, addTrackErr := peerConnection.NewTrack(getPayloadType(mediaEngine, webrtc.RTPCodecTypeVideo, "VP8"), rand.Uint32(), "video", "pion")
 	if addTrackErr != nil {
@@ -116,6 +122,7 @@ func doJoin() {
 
 		// Wait for connection established
 		<-iceConnectedCtx.Done()
+		<-gatherComplete
 
 		// Send our video file frame at a time. Pace our sending so we send it at the same speed it should be played back as.
 		// This isn't required since the video is timestamped, but we will such much higher loss if we send all at once.
@@ -123,6 +130,7 @@ func doJoin() {
 		for {
 			frame, _, ivfErr := ivf.ParseNextFrame()
 			if ivfErr == io.EOF {
+				logger.Debugf("restarting video...")
 				file, ivfErr = os.Open(video)
 				if ivfErr != nil {
 					panic(ivfErr)
@@ -145,7 +153,7 @@ func doJoin() {
 
 			elapsed := time.Now().Sub(startTime).Seconds()
 			if duration > 0 && int(elapsed) > duration {
-				log.Infof("%s seconds elapsed, all done!", duration)
+				logger.Infof("%d seconds elapsed, all done!", duration)
 				os.Exit(0)
 			}
 		}
@@ -154,7 +162,7 @@ func doJoin() {
 	// Set the handler for ICE connection state
 	// This will notify you when the peer has connected/disconnected
 	peerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
-		fmt.Printf("Connection State has changed %s \n", connectionState.String())
+		logger.Infof("Connection State has changed %s", connectionState.String())
 		if connectionState == webrtc.ICEConnectionStateConnected {
 			iceConnectedCtxCancel()
 		}
@@ -229,13 +237,20 @@ func doJoin() {
 				pr.Request("publish", publishInfo,
 					func(result json.RawMessage) {
 						logger.Infof("publish success!")
+
+						if duration > 0 {
+							logger.Infof("Looping video for %d seconds", duration)
+						} else {
+							logger.Infof("Looping video forever")
+						}
+
 						var answer Answer
 						json.Unmarshal(result, &answer)
-
 						peerConnection.SetRemoteDescription(webrtc.SessionDescription{
 							Type: webrtc.SDPTypeAnswer,
 							SDP:  answer.JSEP.SDP,
 						})
+						<-gatherComplete
 					},
 					func(code int, err string) {
 						logger.Infof("publish reject: %d => %s", code, err)

@@ -68,6 +68,7 @@ def getDriver(options=None):
     driver = localDriver()
     options = {
       'browser': 'chrome',
+      'browser_version': 'local',
       'platform': 'local',
     }
     options['job_id'] = os.environ.get('JOB_ID', None)
@@ -100,6 +101,7 @@ def loadRoom(driver, room=None, username=None):
   driver.find_element_by_id("login_displayName").send_keys(username or os.environ.get('ION_USERNAME', 'browsertest.py'))
   driver.find_element_by_class_name("login-join-button").click()
   screenshot(driver, 'form-fill')
+  time.sleep(1)
   print("[%s] Joining room %s..."%(driver.nickname, room))
 
 def checkPink(driver, timeout=15):

@@ -1,4 +1,4 @@
-FROM ubuntu:20.10
+FROM ubuntu:22.04
 
 RUN apt update -yq
 RUN DEBIAN_FRONTEND=noninteractive apt install -yq python3-pip wget unzip ssh jq golang
